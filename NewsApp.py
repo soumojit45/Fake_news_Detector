@@ -107,13 +107,18 @@ input_sms = st.text_area(
 
 
 # Preprocessing Functions
+STOPWORDS = set([
+    'a','an','the','is','are','was','were','in','on','at','to','for','of','and','or','not',
+    'this','that','it','as','with','by','from','be','been','being','have','has','had'
+])
+
 def cleanText(text):
     return re.sub(r'[^a-zA-Z0-9\s]', '', text)
 
 def remove_stop_words(sen):
     y = []
     for i in sen.split():
-        if i.lower() not in stopwords.words('english'):
+        if i.lower() not in STOPWORDS:
             y.append(i)
     return ' '.join(y)
 
@@ -134,6 +139,9 @@ result = model.predict(vector_inp)[0]
 
 # Button + Result
 if st.button("🔍 Analyze News"):
+    cleaned = stemming(remove_stop_words(cleanText(input_sms)))
+    vector_inp = vector.transform([cleaned])
+    result = model.predict(vector_inp)[0]
     if result == 0:
         st.markdown("<div class='result-box fake'>🚫 This News is Classified as <b>FAKE</b>.</div>",
                     unsafe_allow_html=True)
